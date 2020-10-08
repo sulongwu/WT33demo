@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="js/vue.js"></script>
+</head>
+<body>
+    <div id="box">
+        {{num}}
+        <addbtn :count=num></addbtn>
+        <minusbtn :count=num></minusbtn>
+    </div>
+    <script>
+        let bus = new Vue();
+        let vm = new Vue({
+            el:'#box',
+            data:{
+                num:0
+            },
+            mounted() {
+                bus.$on("change",incount=>{
+                    this.num = incount
+                })
+            },
+            components:{
+                'addbtn':{
+                    template:'<button @click="add">+</button>',
+                    props:['count'],
+                    methods: {
+                        add(){
+                            bus.$emit('change',this.count+1);
+                        }
+                    },
+                },
+                'minusbtn':{
+                    template:'<button @click="minus">-</button>',
+                    props:['count'],
+                    methods: {
+                        minus(){
+                            bus.$emit('change',this.count-1);
+                        }
+                    },
+                }
+            }
+        })
+    </script>
+</body>
+</html>

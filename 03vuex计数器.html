@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="js/vue.js"></script>
+    <script src="js/vuex.js"></script>
+</head>
+<body>
+    <div id="box">
+        {{num}}
+        <addbtn></addbtn>
+        <minusbtn></minusbtn>
+    </div>
+    <script>
+        let store = new Vuex.Store({
+            //存储要共享的数据
+            state:{
+                num:2
+            },
+            //类似事件，用于操作共享数据
+            mutations:{
+                add(state){
+                    state.num ++;
+                },
+                minus(state){
+                    state.num --;
+                }
+            }
+        })
+        let vm = new Vue({
+            el:'#box',
+            computed: {
+                num(){
+                    return store.state.num;
+                }
+            },
+            components:{
+                'addbtn':{
+                    template:'<button @click="add">+</button>',
+                    methods: {
+                        add(){
+                            store.commit('add')
+                        }
+                    },
+                },
+                'minusbtn':{
+                    template:'<button @click="minus">-</button>',
+                    methods: {
+                        minus(){
+                            store.commit('minus')
+                        }
+                    },
+                }
+            }
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="js/vue.js"></script>
+</head>
+<body>
+    <div id="box">
+        <mynav></mynav>
+        <mysection></mysection>
+    </div>
+    <script>
+        let bus = new Vue();
+        let vm = new Vue({
+            el:'#box',
+            components:{
+                'mynav':{
+                    template:'<nav>导航标签：{{navmsg}}</nav>',
+                    data() {
+                        return {
+                            navmsg:'nav'
+                        }
+                    },
+                    mounted() {
+                        // bus.$on('send',data=>{
+                        //     console.log(data);
+                        //     this.navmsg = data;
+                        // })
+                        bus.$on('send',function(data){
+                            this.navmsg = data;
+                        }.bind(this))
+                    },
+                },
+                'mysection':{
+                    template:'<section @click="fn">标签：{{secmsg}}</section>',
+                    data(){
+                        return{
+                            secmsg:'section'
+                        }
+                    },
+                    methods: {
+                        fn(){
+                            bus.$emit('send',this.secmsg)
+                        }
+                    },
+                }
+            }
+        })
+    </script>
+</body>
+</html>
