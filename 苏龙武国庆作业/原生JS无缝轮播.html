@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>JS原生无缝轮播图</title>
+	<style>
+	    *{
+	    	margin: 0;
+	    	padding: 0;
+	    }
+		.banner{
+            margin: 0 auto;
+            width: 640px;
+            height: 360px;
+            overflow: hidden;
+            position: relative;
+		}
+        .imgs{
+        	width: 1000%;
+        	height: 100%;
+        	position: absolute;
+        	top: 0;
+        	left: 0;
+        	font-size: 0;
+        }
+        .imgs>img{
+        	width: 10%;
+        	height: 100%;
+        	display: inline-block;
+        }
+        .left,.right{
+        	cursor: pointer;
+            display: block;
+            width: 50px;
+            height: 100px;
+            position: absolute;
+            top: 50%;
+            margin-top: -50px;
+            line-height: 100px;
+            text-align: center;
+            color: #fff;
+            font-size: 30px;
+            background-color: rgba(0,0,0,.6);
+        }
+        .left{
+        	left: 0; 
+        }
+        .right{
+        	right: 0;
+        }
+        .point{
+        	position: absolute;
+            width: 100%;
+            text-align: center;
+            height: 15px;
+            bottom: 40px;
+            font-size: 0;
+        }
+        .point>li{
+        	display: inline-block;
+        	width: 15px;
+        	height: 15px;
+        	background-color: #ccc;
+        	border-radius: 50% 50%;
+        	margin: 0 10px; 
+        	cursor: pointer;
+        }
+        .point>.on{
+        	background-color: red;
+        }
+	</style>
+</head>
+<body>
+	<div class="banner">
+		<div class="imgs">		
+			<img src="img/1.jpg" />
+			<img src="img/2.jpg" />
+			<img src="img/3.jpg" />
+			<img src="img/4.jpg" />
+			<img src="img/5.jpg" />
+			<img src="img/1.jpg" />
+		</div>
+		<span class="left"><</span>
+		<span class="right">></span>
+		<ul class="point">
+			<li class="on"></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+	</div>
+	<script>
+		var win = document.querySelector(".banner");
+		var imgs = document.querySelector(".imgs");
+		var left = document.querySelector(".left");
+		var right = document.querySelector(".right");
+		var point = document.getElementsByClassName("point")[0].children;
+		var index = 0;//图片下标
+		var Wnum = win.offsetWidth;//视口宽度
+		var times;//声明一个时间函数的变量
+		var time;//自动轮播时间方法
+		var Crun = true;//点击事件判断
+		//console.log(start)
+		function run(){//轮播
+		   var start = imgs.offsetLeft;//开始坐标
+		   var end = index*Wnum*(-1);//结束坐标，往右移动所以为负
+		   var runD = end - start;//移动距离
+		   var px = 30;//移动距离
+		   var t = 0;//声明一个参量
+		   clearInterval(times);//开始前先清除上次的定时器
+           times = setInterval(function(){
+           	   t++;
+           	   if(t>=px){//判断一张轮播是否结束
+           	   	clearInterval(times);//一张结束清除定时器
+           	   	Crun = true;//一张结束点击时间可用
+           	   }
+           	   imgs.style.left = runD/px*t+start+'px';
+           	   //运动left值
+           	   if(index>=point.length&&t>=px){//判断是否到最后一张
+           	      imgs.style.left = 0;//最后一张与第一张是一样的，立刻切换到第一张去，不会影响效果
+           	      index = 0;//下标变为第一张
+           	   }
+           	   pointIn();//白点跟随图片改变
+           	   if(index>=point.length){//到最后一张时，对应上第一个白点
+           	   	  point[0].className = 'on';
+           	   }else{
+           	   	  point[index].className = 'on';
+           	   }
+           },20);
+		}
+		function pointIn(){
+			for(var i = 0;i<point.length;i++){
+				point[i].className = '';//清除所有点的样式
+			}
+		}
+		// for(var i = 0;i<point.length;i++){//遍历所有点
+		// 	point[i].idx = i;//存起下标
+		// 	point[i].onclick = function(){
+		// 		index = this.idx;//点击时获取点击到的下标
+		// 		run();
+		// 	}
+		// }
+		for(var i = 0;i<point.length;i++){//遍历所有点
+			(function(idx){  //将i当参数传入
+				point[idx].onclick = function(){
+					index = idx;//点击时获取点击到的下标
+					run();
+				}
+			})(i);
+		}
+        time = setInterval(function(){//定时器
+            index++;
+            run();
+        },2000);
+        win.onmouseover = function(){//鼠标移入
+        	clearInterval(time)
+        }
+        win.onmouseout = function(){//鼠标离开
+        	time = setInterval(function(){
+	            index++;
+	            run();
+            },2000);
+        }
+        right.onclick = function(){//右移动
+        	if(Crun){
+        		index++;
+                run();
+        	}
+            Crun = false;//一张未切换完，不会切换下一张
+        }
+        left.onclick = function(){//左移动
+        	if(Crun){
+        		if(index==0){//如果是第一张
+        		index = point.length; //下标切换为最后一张
+        		imgs.style.left = index*Wnum*(-1)+'px';//left值切换到最后一张
+        	}
+            index--;
+            run();
+        	}
+        	Crun = false;//一张未切换完，不会切换下一张
+        }
+	</script>
+</body>
+</html>
+<!--
+	逻辑：
+
+1. 轮播的核心原理是每隔指定的时间（比如2s）改变父元素的指定 left（比如屏幕宽度）；
+
+2. 轮播到最后一张图片（这里的最后一张指的是拼接的第一张）时；
+
+①清除掉定时器；
+
+②开启临界处理（重置父元素的left）；
+
+③开启下一轮轮播。
+
+这里是实现无缝轮播的关键；其目的是播放最后一张的同时，与第一张偷梁换柱。
+因为最后一张与第一张图片相同，所以快速地改变其 left 用户并无感知。
+并且同时开启下一轮定时器，2秒钟之后执行第二张图片播放。
+而这个2秒钟之内就好了准备（清除当前定时器，重置父元素 left）。
+-->

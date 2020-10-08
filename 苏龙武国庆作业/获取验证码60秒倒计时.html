@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="js/jquery-1.12.4.js"></script>
+	</head>
+	<body>
+		<div>
+			验证码：<input type="text" name="" id="" value="" />
+			<button type="button" name="button">点击获取验证码</button>
+		</div>
+		
+	</body>
+</html>
+<script type="text/javascript">
+	$("button[name='button']").click(function(event) {
+            var time = 60;
+            settime($(this));
+            function settime(obj){
+                if (time==0) {
+                    $(obj).attr('disabled', false);
+                    $(obj).html("点击获取验证码");
+                    time = 60;
+                    return;
+                } else{
+                    $(obj).attr('disabled', true);
+                    $(obj).html(time+"秒后重新发送");
+                    time--;
+                }
+                setTimeout(function() {
+                    settime(obj)
+                },1000)
+            }
+        });
+</script>
